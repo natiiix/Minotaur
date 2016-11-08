@@ -7,6 +7,19 @@ namespace Minotaur
 {
     public partial class FormMain : Form
     {
+        private const int MOVE_UP = 0;
+        private const int MOVE_RIGHT = 1;
+        private const int MOVE_DOWN = 2;
+        private const int MOVE_LEFT = 3;
+
+        private int[,] MOVE_OFFSET = new int[4, 2]
+        {
+            {  0, -1 },
+            {  1,  0 },
+            {  0,  1 },
+            { -1,  0 }
+        };
+
         private BackgroundWorker bwSolver;
         private Labyrinth lab;
 
@@ -78,7 +91,37 @@ namespace Minotaur
 
         private void SolveLabyrinth()
         {
+            for(int target = 0; target < lab.pTarget.Length; target++)
+            {
+                byte[,] pixels = lab.pixels;
 
+                for(int otherTarget = 0; otherTarget < lab.pTarget.Length; otherTarget++)
+                {
+                    if (otherTarget == target)
+                        continue;
+
+                    pixels[lab.pTarget[otherTarget].X,
+                           lab.pTarget[otherTarget].Y] = Labyrinth.COLOR_BLACK;
+                }
+
+                Point currentPosition = lab.pStart;
+                int[] moves = new int[0];
+
+
+            }
+        }
+
+        private bool CanPerformMove(byte[,] pixels, Point position, int move)
+        {
+            return (pixels[position.X + MOVE_OFFSET[move, 0],
+                           position.X + MOVE_OFFSET[move, 1]] == Labyrinth.COLOR_WHITE);
+        }
+
+        private void PerformMove(ref Point position, int move)
+        {
+            position = new Point(
+                            position.X + MOVE_OFFSET[move, 0],
+                            position.X + MOVE_OFFSET[move, 1]);
         }
     }
 }

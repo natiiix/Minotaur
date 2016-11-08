@@ -6,17 +6,19 @@ namespace Minotaur
 {
     class Labyrinth
     {
-        private const byte COLOR_BLACK = 0;
-        private const byte COLOR_RED = 9;
-        private const byte COLOR_GREEN = 10;
-        private const byte COLOR_BLUE = 12;
-        private const byte COLOR_WHITE = 15;
+        public const byte COLOR_BLACK = 0;  // wall
+        public const byte COLOR_RED = 9;    // target destination
+        public const byte COLOR_GREEN = 10; // start point
+        public const byte COLOR_BLUE = 12;  // path traveled
+        public const byte COLOR_WHITE = 15; // floor
 
-        private byte[,] pixels;
+        public byte[,] pixels;
+        public Point pStart;
+        public Point[] pTarget;
 
         public Labyrinth()
         {
-
+            pStart = new Point(-1, -1);
         }
 
         public bool Extract(Bitmap bmpLabyrinth)
@@ -31,9 +33,10 @@ namespace Minotaur
 
             System.Runtime.InteropServices.Marshal.Copy(ptr, colorValues, 0, bytes);
             bmpLabyrinth.UnlockBits(bmpData);
-
-            pixels = new byte[rect.Width, rect.Height];
             
+            pixels = new byte[rect.Width, rect.Height];
+            pTarget = new Point[0];
+
             int rowByteLen = rect.Width / 2;
             int rowByteOdd = rect.Width % 2;
 
@@ -61,15 +64,33 @@ namespace Minotaur
                             out bDump);
                     }
                 }
-            }            
 
-            return false;
+                for(int ix = 0; ix < rect.Width; ix++)
+                {
+                    if (pixels[ix, iy] == COLOR_GREEN)
+                    {
+                        if (validPoint(pStart))
+                            pStart = new Point(ix, iy);
+                        else
+                            return false;
+                    }
+                    else if (pixels[ix, iy] == COLOR_RED)
+                        Misc.ArrayAppend(ref pTarget, new Point(ix, iy));
+                }
+            }
+
+            return (validPoint(pStart) && pTarget.Length > 0);
         }
 
         private void separatePixels(byte bIn, out byte bOut1, out byte bOut2)
         {
             bOut1 = (byte)(bIn / 16);
             bOut2 = (byte)(bIn % 16);
+        }
+
+        private bool validPoint(Point p)
+        {
+            return (p.X > 0 && p.Y > 0);
         }
     }
 }
