@@ -20,7 +20,8 @@ namespace Minotaur
             {  0,  1 },
             { -1,  0 }
         };
-        
+
+        private string strDirectory;
         private BackgroundWorker bwSolver;
         private Bitmap bmpDisplay;
         private Labyrinth lab;
@@ -82,6 +83,8 @@ namespace Minotaur
             bmpDisplay = new Bitmap(openFileDialogLabyrinth.FileName);
             buttonSolve.Enabled = true;
             pictureBoxLabyrinth.Image = bmpDisplay;
+
+            strDirectory = openFileDialogLabyrinth.FileName.Replace(openFileDialogLabyrinth.SafeFileName, string.Empty);
         }
         #endregion
 
@@ -116,47 +119,35 @@ namespace Minotaur
                        lab.pTarget[otherTarget].Y] = Labyrinth.COLOR_BLACK;
             }
 
-            LabyrinthSolution[] targetSolutions = SolveMoves(pixels, new int[0], lab.pStart, lab.pTarget[targetIndex]);
             LabyrinthSolution bestSolution = new LabyrinthSolution(new int[0]);
-
-            for (int solutionIndex = 0; solutionIndex < targetSolutions.Length; solutionIndex++)
-            {
-                if (bestSolution.Moves.Length <= 0 ||
-                    targetSolutions[solutionIndex].Moves.Length < bestSolution.Moves.Length)
-                {
-                    bestSolution = targetSolutions[solutionIndex];
-                }
-            }
+            GetBestSolution(ref bestSolution, pixels, new int[0], lab.pStart, lab.pTarget[targetIndex]);
 
             Bitmap bmpSolution = GenerateBitmap(pixels, bestSolution);
             swTarget.Stop();
-            bmpSolution.Save("Target[" + targetIndex.ToString() + "]_Moves[" + bestSolution.Moves.Length.ToString() + "]_Time[" + swTarget.ElapsedMilliseconds.ToString() + "].bmp", System.Drawing.Imaging.ImageFormat.Bmp);
+            bmpSolution.Save(strDirectory + "Target[" + targetIndex.ToString() + "]_Moves[" + bestSolution.Moves.Length.ToString() + "]_Time[" + swTarget.ElapsedMilliseconds.ToString() + "].bmp", System.Drawing.Imaging.ImageFormat.Bmp);
             bmpDisplay = bmpSolution;
         }
 
-        private LabyrinthSolution[] SolveMoves(byte[,] pixels, int[] moves, Point currentPosition, Point pTarget)
+        private void GetBestSolution(ref LabyrinthSolution solution, byte[,] pixels, int[] moves, Point currentPosition, Point pTarget)
         {
-            LabyrinthSolution[] solutions = new LabyrinthSolution[0];
-
             for (int move = 0; move < MOVE_OFFSET.GetLength(0); move++)
             {
                 Point futurePosition = GetPositionAfterMove(currentPosition, move);
 
                 if (futurePosition == pTarget)
-                    Misc.ArrayAppend(ref solutions, new LabyrinthSolution(moves));
-                else if (CanMoveHere(pixels, futurePosition))
+                    solution = new LabyrinthSolution(moves);
+                else if (CanMoveHere(pixels, futurePosition) &&
+                         (solution.Moves.Length == 0 || (moves.Length + 1) < solution.Moves.Length))
                 {
                     Misc.ArrayAppend(ref moves, move);
                     pixels[futurePosition.X, futurePosition.Y] = Labyrinth.COLOR_BLUE;
-
-                    Misc.ArrayAppend(ref solutions, SolveMoves(pixels, moves, futurePosition, pTarget));
+                    
+                    GetBestSolution(ref solution, pixels, moves, futurePosition, pTarget);
 
                     Misc.ArrayRemoveLast(ref moves);
                     pixels[futurePosition.X, futurePosition.Y] = Labyrinth.COLOR_WHITE;
                 }
             }
-
-            return solutions;
         }
 
         private Point GetPositionAfterMove(Point position, int move)
@@ -189,20 +180,13 @@ namespace Minotaur
 
             Bitmap bmpOutput = new Bitmap(outputPixels.GetLength(0), outputPixels.GetLength(1), System.Drawing.Imaging.PixelFormat.Format4bppIndexed);
 
-            // Lock the bitmap's bits.  
             Rectangle rect = new Rectangle(0, 0, bmpOutput.Width, bmpOutput.Height);
             System.Drawing.Imaging.BitmapData bmpData = bmpOutput.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite, bmpOutput.PixelFormat);
 
-            // Get the address of the first line.
             IntPtr ptr = bmpData.Scan0;
-
-            // Declare an array to hold the bytes of the bitmap.
             int bytes = Math.Abs(bmpData.Stride) * bmpOutput.Height;
 
-            // Copy the RGB values back to the bitmap
             System.Runtime.InteropServices.Marshal.Copy(GetBitmapByteArray(outputPixels, bmpData.Stride), 0, ptr, bytes);
-
-            // Unlock the bits.
             bmpOutput.UnlockBits(bmpData);
 
             return bmpOutput;
