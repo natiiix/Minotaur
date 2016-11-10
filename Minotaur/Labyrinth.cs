@@ -12,8 +12,8 @@ namespace Minotaur
         public const byte COLOR_BLUE = 12;  // path traveled
         public const byte COLOR_WHITE = 15; // floor
 
-        public byte[,] pixels;
-        public Point pStart;
+        public byte[,] pixels { get; private set; }
+        public Point pStart { get; private set; }
         public Point[] pTarget;
 
         public Labyrinth()
@@ -69,7 +69,7 @@ namespace Minotaur
                 {
                     if (pixels[ix, iy] == COLOR_GREEN)
                     {
-                        if (validPoint(pStart))
+                        if (!validPoint(pStart))
                             pStart = new Point(ix, iy);
                         else
                             return false;

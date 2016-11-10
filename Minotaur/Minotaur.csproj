@@ -53,6 +53,7 @@
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
     <Compile Include="Labyrinth.cs" />
+    <Compile Include="LabyrinthSolution.cs" />
     <Compile Include="Misc.cs" />
     <Compile Include="PictureBoxWithInterpolationMode.cs">
       <SubType>Component</SubType>
