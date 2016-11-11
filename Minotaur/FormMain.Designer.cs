@@ -32,6 +32,7 @@
             this.buttonLoad = new System.Windows.Forms.Button();
             this.buttonSolve = new System.Windows.Forms.Button();
             this.pictureBoxLabyrinth = new Minotaur.PictureBoxWithInterpolationMode();
+            this.checkBoxDisplayProgress = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLabyrinth)).BeginInit();
             this.SuspendLayout();
             // 
@@ -47,7 +48,7 @@
             this.buttonLoad.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.buttonLoad.Location = new System.Drawing.Point(12, 12);
             this.buttonLoad.Name = "buttonLoad";
-            this.buttonLoad.Size = new System.Drawing.Size(297, 23);
+            this.buttonLoad.Size = new System.Drawing.Size(240, 23);
             this.buttonLoad.TabIndex = 0;
             this.buttonLoad.Text = "Load";
             this.buttonLoad.UseVisualStyleBackColor = true;
@@ -57,9 +58,9 @@
             // 
             this.buttonSolve.Enabled = false;
             this.buttonSolve.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.buttonSolve.Location = new System.Drawing.Point(315, 12);
+            this.buttonSolve.Location = new System.Drawing.Point(258, 12);
             this.buttonSolve.Name = "buttonSolve";
-            this.buttonSolve.Size = new System.Drawing.Size(297, 23);
+            this.buttonSolve.Size = new System.Drawing.Size(240, 23);
             this.buttonSolve.TabIndex = 1;
             this.buttonSolve.Text = "Solve";
             this.buttonSolve.UseVisualStyleBackColor = true;
@@ -76,11 +77,25 @@
             this.pictureBoxLabyrinth.TabIndex = 2;
             this.pictureBoxLabyrinth.TabStop = false;
             // 
+            // checkBoxDisplayProgress
+            // 
+            this.checkBoxDisplayProgress.AutoSize = true;
+            this.checkBoxDisplayProgress.Checked = true;
+            this.checkBoxDisplayProgress.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxDisplayProgress.Location = new System.Drawing.Point(504, 15);
+            this.checkBoxDisplayProgress.Name = "checkBoxDisplayProgress";
+            this.checkBoxDisplayProgress.Size = new System.Drawing.Size(104, 17);
+            this.checkBoxDisplayProgress.TabIndex = 3;
+            this.checkBoxDisplayProgress.Text = "Display Progress";
+            this.checkBoxDisplayProgress.UseVisualStyleBackColor = true;
+            this.checkBoxDisplayProgress.CheckedChanged += new System.EventHandler(this.checkBoxDisplayProgress_CheckedChanged);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(624, 441);
+            this.Controls.Add(this.checkBoxDisplayProgress);
             this.Controls.Add(this.pictureBoxLabyrinth);
             this.Controls.Add(this.buttonSolve);
             this.Controls.Add(this.buttonLoad);
@@ -89,6 +104,7 @@
             this.Load += new System.EventHandler(this.FormMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLabyrinth)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -98,6 +114,7 @@
         private System.Windows.Forms.Button buttonLoad;
         private System.Windows.Forms.Button buttonSolve;
         private PictureBoxWithInterpolationMode pictureBoxLabyrinth;
+        private System.Windows.Forms.CheckBox checkBoxDisplayProgress;
     }
 }
 

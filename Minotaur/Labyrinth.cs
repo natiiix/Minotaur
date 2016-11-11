@@ -69,7 +69,7 @@ namespace Minotaur
                 {
                     if (pixels[ix, iy] == COLOR_GREEN)
                     {
-                        if (!validPoint(pStart))
+                        if (pStart.X < 0 || pStart.Y < 0)
                             pStart = new Point(ix, iy);
                         else
                             return false;
@@ -79,18 +79,15 @@ namespace Minotaur
                 }
             }
 
-            return (validPoint(pStart) && pTarget.Length > 0);
+            return ((pStart.X >= 0 &&
+                     pStart.Y >= 0) &&
+                    pTarget.Length > 0);
         }
 
         private void separatePixels(byte bIn, out byte bOut1, out byte bOut2)
         {
             bOut1 = (byte)(bIn / 16);
             bOut2 = (byte)(bIn % 16);
-        }
-
-        private bool validPoint(Point p)
-        {
-            return (p.X > 0 && p.Y > 0);
         }
     }
 }

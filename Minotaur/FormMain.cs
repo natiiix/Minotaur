@@ -23,8 +23,12 @@ namespace Minotaur
 
         private string strDirectory;
         private BackgroundWorker bwSolver;
-        private Bitmap bmpDisplay;
         private Labyrinth lab;
+
+        private Bitmap bmpDisplay;
+        private DateTime displayLastUpdate;
+        private TimeSpan displayDelay;
+        private bool displayProgress;
 
         #region Events
         public FormMain()
@@ -40,6 +44,9 @@ namespace Minotaur
             bwSolver.DoWork += BwSolver_DoWork;
             bwSolver.ProgressChanged += BwSolver_ProgressChanged;
             bwSolver.RunWorkerCompleted += BwSolver_RunWorkerCompleted;
+
+            displayDelay = new TimeSpan(0, 0, 0, 0, 100);
+            displayProgress = checkBoxDisplayProgress.Checked;
         }
 
         private void BwSolver_DoWork(object sender, DoWorkEventArgs e)
@@ -49,7 +56,7 @@ namespace Minotaur
 
         private void BwSolver_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            pictureBoxLabyrinth.Image = bmpDisplay;
+            DisplayUpdate();
         }
 
         private void BwSolver_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -82,11 +89,22 @@ namespace Minotaur
         {
             bmpDisplay = new Bitmap(openFileDialogLabyrinth.FileName);
             buttonSolve.Enabled = true;
-            pictureBoxLabyrinth.Image = bmpDisplay;
+            DisplayUpdate();
 
             strDirectory = openFileDialogLabyrinth.FileName.Replace(openFileDialogLabyrinth.SafeFileName, string.Empty);
         }
+
+        private void checkBoxDisplayProgress_CheckedChanged(object sender, EventArgs e)
+        {
+            displayProgress = checkBoxDisplayProgress.Checked;
+        }
         #endregion
+
+        private void DisplayUpdate()
+        {
+            pictureBoxLabyrinth.Image = bmpDisplay;
+            displayLastUpdate = DateTime.Now;
+        }
 
         private void SolveLabyrinth()
         {
@@ -142,6 +160,13 @@ namespace Minotaur
                     Misc.ArrayAppend(ref moves, move);
                     pixels[futurePosition.X, futurePosition.Y] = Labyrinth.COLOR_BLUE;
                     
+                    if (displayProgress &&
+                        DateTime.Now - displayLastUpdate >= displayDelay)
+                    {
+                        bmpDisplay = GenerateBitmap(pixels);
+                        DisplayUpdate();
+                    }
+
                     GetBestSolution(ref solution, pixels, moves, futurePosition, pTarget);
 
                     Misc.ArrayRemoveLast(ref moves);
@@ -163,11 +188,12 @@ namespace Minotaur
                     pixels[p.X, p.Y] == Labyrinth.COLOR_WHITE);
         }
 
-        private Bitmap GenerateBitmap(byte[,] pixels, LabyrinthSolution solution)
+        private Bitmap GenerateBitmap(byte[,] pixels, LabyrinthSolution solution = null)
         {
             byte[,] outputPixels = pixels;
 
-            if (solution.Moves.Length > 0)
+            if (solution != null &&
+                solution.Moves.Length > 0)
             {
                 Point position = lab.pStart;
 
